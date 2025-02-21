@@ -11,6 +11,7 @@ AC_SUBST([CHIP])
 
 AM_CONDITIONAL([BUILD_P9], [test "$CHIP" = "p9"])
 AM_CONDITIONAL([BUILD_P10], [test "$CHIP" = "p10"])
+AM_CONDITIONAL([BUILD_P12], [test "$CHIP" = "p12"])
 
 if test "$CHIP" = "p9" ; then
 	AC_DEFINE([IPL_P9], [1], [Define to 1 for P9])
@@ -18,6 +19,10 @@ fi
 
 if test "$CHIP" = "p10" ; then
 	AC_DEFINE([IPL_P10], [1], [Define to 1 for P10])
+fi
+
+if test "$CHIP" = "p12" ; then
+	AC_DEFINE([IPL_P12], [1], [Define to 1 for P12])
 fi
 
 AC_ARG_ENABLE([libphal],
@@ -93,6 +98,19 @@ AC_LINK_IFELSE(
 			   [openpower::guard::libguard_init])],
 			   [LIBS="$LIBS -lguard"],
 			   [AC_MSG_ERROR([Guard library not found])])
+LDFLAGS=$saved_LDFLAGS
+CXXFLAGS=$saved_CXXFLAGS
+
+saved_LDFLAGS=$LDFLAGS
+saved_CXXFLAGS=$CXXFLAGS
+
+LDFLAGS="$LDFLAGS -lhostfw_ipl"
+CXXFLAGS="$CXXFLAGS -I${INCDIR}"
+AC_LINK_IFELSE(
+               [AC_LANG_PROGRAM([#include<iplfacade.H>],
+			   [])],
+			   [LIBS="$LIBS -lhostfw_ipl"],
+			   [AC_MSG_ERROR([hostfw library not found])])
 LDFLAGS=$saved_LDFLAGS
 CXXFLAGS=$saved_CXXFLAGS
 

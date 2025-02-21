@@ -77,6 +77,11 @@ libipl_istep_SOURCES = \
 	libipl/p10/ipl_poweroff.C
 endif
 
+if BUILD_P12
+libipl_istep_SOURCES = \
+	libipl/p12/ipl0.C
+endif
+
 libipl_la_SOURCES = \
 	$(libipl_istep_SOURCES) \
 	libipl/libipl.C \
@@ -87,6 +92,7 @@ libipl_la_SOURCES = \
 libipl_la_CXXFLAGS = -Wall -Werror $(EKB_CXXFLAGS) \
 	$(libipl_istep_CXXFLAGS) \
 	-I$(srcdir)/libipl
+
 libipl_la_LDFLAGS = -version-info $(SONAME_CURRENT):$(SONAME_REVISION):$(SONAME_AGE)
 
 if BUILD_PHAL_API
@@ -107,5 +113,6 @@ libphal_la_SOURCES = \
 
 libphal_la_CXXFLAGS = -Wall -Werror $(EKB_CXXFLAGS) \
 	-I$(srcdir)/libphal
+
 libphal_la_LDFLAGS = -version-info $(SONAME_CURRENT):$(SONAME_REVISION):$(SONAME_AGE)
 endif
