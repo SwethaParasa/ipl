@@ -137,6 +137,17 @@ int main(int argc, char *const *argv)
 	enum pdbg_backend backend = PDBG_BACKEND_SBEFIFO;
 	int rc, i, opt, log_level = 0;
 	bool do_backend = false;
+    
+	constexpr auto devtree = "/usr/share/pdata/pst_fake.dtb";
+    // std::cout << "enter DEV 1238 main application " << std::endl;
+
+    // PDBG_DTB environment variable set to CEC device tree path
+    if (setenv("PDBG_DTB", devtree, 1))
+    {
+        std::cerr << "Failed to set PDBG_DTB: " << strerror(errno) << std::endl;
+        return 0;
+    }
+
 
 	while ((opt = getopt(argc, argv, "b:d:D:")) != -1) {
 		switch (opt) {
