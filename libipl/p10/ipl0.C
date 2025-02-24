@@ -193,6 +193,30 @@ static int ipl_ph_sppe_config_update(void)
             std::cout << "pib target for hub chip not enabled " << std::endl;
             return -1;
         }
+        struct pdbg_target *root;
+        root = pdbg_target_root();
+        fapi2::buffer<uint32_t> boot_flags;
+        boot_flags.setBit(0);
+        if (!pdbg_target_set_attribute(hubchip, "ATTR_BOOT_FLAGS", 4, 1,
+				       &boot_flags)) {
+		ipl_log(IPL_ERROR,
+			"Attribute [ATTR_BOOT_FLAGS] update failed \n");
+		return 1;
+                       }
+        uint8_t disable_security=1;
+        if (!pdbg_target_get_attribute(root, "ATTR_DISABLE_SECURITY", 1, 1,
+				       &disable_security)) {
+		ipl_log(IPL_ERROR,
+			"Attribute [ATTR_DISABLE_SECURITY] read failed \n");
+		return 1;
+	}
+        uint8_t core_mode=0x01;
+        if (!pdbg_target_set_attribute(root, "ATTR_FUSED_CORE_MODE", 1, 1,
+				       &core_mode)) {
+		ipl_log(IPL_ERROR,
+			"Attribute [ATTR_FUSED_CORE_MODE] update failed \n");
+		return 1;
+	} 
         std::cout << "invoking ps_sppe_config_update HWP" << std::endl;
         ret = ipl::ps_sppe_config_update(hubchip);
         if (ret == 0)
@@ -231,6 +255,23 @@ static int ipl_cbs_start(void)
         {
             std::cout << "succes in call to HWP ps_cbs_start "
                       << std::endl;
+            
+           /*ipl_set_sbe_state(hubchip,
+							  SBE_STATE_CHECK_CFAM);*/
+
+					if (!ipl_sbe_booted(hubchip, 25)) {
+						ipl_log(IPL_ERROR,
+							"SBE did not boot\n");
+						//err_type = IPL_ERR_SBE_BOOT;
+					} else {
+						// Update Primary processor SBE
+						// state to booted Boot error
+						// callback is only required for
+						// failure.
+						/*ipl_set_sbe_state(
+						    hubchip, SBE_STATE_BOOTED);*/
+                        std::cout<<"sbe booted"<<std::endl;
+					}
         }
         break;
     }
